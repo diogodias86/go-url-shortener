@@ -7,8 +7,8 @@ import (
 )
 
 func main() {
+	http.HandleFunc("/favicon.ico", handlers.FavIconHandler)
 	http.HandleFunc("/", handlers.IndexHandler)
-	//http.HandleFunc("/favicon.ico", nil)
 
 	fmt.Println("Server running on http://localhost:8080...")
 	http.ListenAndServe(":8080", nil)

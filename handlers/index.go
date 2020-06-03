@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 	"text/template"
 )
 
@@ -13,6 +12,13 @@ var templateEngine = template.Must(template.ParseGlob("templates/*.html"))
 type data struct {
 	ErrorMessage string
 	NewURL       string
+}
+
+//FavIconHandler ...
+func FavIconHandler(w http.ResponseWriter, r *http.Request) {
+	// w.Header().Set("Content-Type", "image/x-icon")
+	// w.Header().Set("Cache-Control", "public, max-age=7776000")
+	// fmt.Fprintln(w, "data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=")
 }
 
 //IndexHandler ...
@@ -30,12 +36,7 @@ func IndexHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func handleURLRedirect(path string, rw http.ResponseWriter, r *http.Request) {
-	fmt.Println("Redirecting...")
-
-	//TODO: REMOVE
-	if strings.Contains(path, "favicon") {
-		return
-	}
+	fmt.Printf("path: %s\n", path)
 
 	//Get the original URL from DB
 
