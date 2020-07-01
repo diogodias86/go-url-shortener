@@ -1,0 +1,31 @@
+{{define "index"}}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shrinker</title>
+</head>
+
+<body>
+    <h1>URL Shrinker</h1>
+
+    {{if .ErrorMessage }}
+    <span>{{.ErrorMessage}}</span>
+    {{ end }}
+
+    <form action="/" method="post">
+        <input type="url" name="url" id="url" />
+        <input type="submit" value="Send" />
+    </form>
+
+    {{if .NewURL }}
+    <p>Your new URL is: </p>
+    <span>{{.NewURL}}</span>
+    {{ end }}
+</body>
+
+</html>
+{{end}}

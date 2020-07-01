@@ -1,10 +1,14 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"text/template"
+
+	"github.com/diogodias86/go-url-shortener/urlgenerator"
+
+	"github.com/diogodias86/go-url-shortener/db"
 )
 
 var templateEngine = template.Must(template.ParseGlob("templates/*.html"))
@@ -16,6 +20,8 @@ type data struct {
 
 //FavIconHandler ...
 func FavIconHandler(w http.ResponseWriter, r *http.Request) {
+	//http.ServeFile(w, r, "templates/favicon.ico")
+
 	// w.Header().Set("Content-Type", "image/x-icon")
 	// w.Header().Set("Cache-Control", "public, max-age=7776000")
 	// fmt.Fprintln(w, "data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=")
@@ -36,12 +42,18 @@ func IndexHandler(rw http.ResponseWriter, r *http.Request) {
 }
 
 func handleURLRedirect(path string, rw http.ResponseWriter, r *http.Request) {
-	fmt.Printf("path: %s\n", path)
+	path = strings.Replace(path, "/", "", -1)
 
 	//Get the original URL from DB
+	url := db.GetURL(path)
 
-	//Redirect
-	http.Redirect(rw, r, "", http.StatusMovedPermanently)
+	if url == "" {
+		//404 - Not Found
+		http.NotFound(rw, r)
+	} else {
+		//Redirect
+		http.Redirect(rw, r, url, http.StatusMovedPermanently)
+	}
 }
 
 func postURL(rw http.ResponseWriter, r *http.Request) {
@@ -54,9 +66,13 @@ func postURL(rw http.ResponseWriter, r *http.Request) {
 	if _url == "" || err != nil {
 		data.ErrorMessage = "Enter a valid url."
 	} else {
-		//Save in DB
+		//Generate the new url
+		newURL := urlgenerator.Generate()
 
-		data.NewURL = "new.url/e1wa3"
+		//Save in DB
+		db.Insert(_url, newURL)
+
+		data.NewURL = r.Host + "/" + newURL
 	}
 
 	templateEngine.ExecuteTemplate(rw, "index", data)
